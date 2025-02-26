@@ -46,7 +46,7 @@ services:
     logging: *default-logging
     restart: always
   judge:
-    build: https://github.com/TIOJ-INFOR-Online-Judge/tioj-judge.git#e6e04d1d6e950ed54e4286d2d531ef7d8cd08b0d
+    build: https://github.com/TIOJ-INFOR-Online-Judge/tioj-judge.git#2d556b40d8b88e41319423f6bd3116e7c0924375
     environment:
       TIOJ_URL: "http://localhost:4000"
       TIOJ_KEY: $FETCH_KEY
