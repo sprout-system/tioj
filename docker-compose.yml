@@ -60,6 +60,17 @@ services:
     pid: host
     logging: *default-logging
     restart: always
+  dufs:
+    image: sigoden/dufs
+    container_name: dufs
+    ports:
+    - 5000:5000
+    volumes:
+    - /srv/tioj/public/pmisc:/data
+    networks:
+      - app
+    command: /data --allow-upload -a admin:$FILE_UPLOAD_PASSWORD@/:rw -b 0.0.0.0
+    restart: always
 
 networks:
   app:
