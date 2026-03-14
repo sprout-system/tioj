@@ -4,6 +4,7 @@ module ContestsHelper
       "ioi" => "IOI style (rank by score)",
       "ioi_new" => "New IOI style (rank by score, union by subtasks)",
       "acm" => "ACM style (rank by solved problems)",
+      "homework" => "sprout homework (adjusting scores by setting soft-deadline)"
     }
   end
 
@@ -12,6 +13,7 @@ module ContestsHelper
       "ioi" => "IOI",
       "ioi_new" => "New IOI",
       "acm" => "ACM",
+      "homework" => "homework"
     }
   end
 
