@@ -32,7 +32,7 @@ module ContestsHelper
   end
 
   # return item_state
-  def acm_ranklist_state(submission, start_time, item_state, is_waiting)
+  def acm_ranklist_state(submission, start_time, item_state, is_waiting, problem_settings)
     # state: [attempts, ac_usec, waiting]
     if item_state.nil?
       item_state = [0, nil, 0]
@@ -51,7 +51,7 @@ module ContestsHelper
     item_state
   end
 
-  def ioi_ranklist_state(submission, start_time, item_state, is_waiting)
+  def ioi_ranklist_state(submission, start_time, item_state, is_waiting, problem_settings)
     # state: [score, has_sub, waiting]
     if item_state.nil?
       item_state = [BigDecimal(0), false, 0]
@@ -65,7 +65,7 @@ module ContestsHelper
     end
   end
 
-  def ioi_new_ranklist_state(submission, start_time, item_state, is_waiting)
+  def ioi_new_ranklist_state(submission, start_time, item_state, is_waiting, problem_settings)
     # state: [score, has_sub, waiting, subtask_scores]
     if item_state.nil?
       item_state = [BigDecimal(0), false, 0, nil]
@@ -86,15 +86,19 @@ module ContestsHelper
     end
   end
 
+  def homework_ranklist_state(submission, start_time, item_state, is_waiting, problem_settings) 
+  end
+
   public
 
-  def ranklist_data(submissions, start_time, freeze_start, rule)
+  def ranklist_data(submissions, start_time, freeze_start, rule, problem_settings)
     res = Hash.new { |h, k| h[k] = [] }
     participants = Set[]
     func = {
       'acm' => method(:acm_ranklist_state),
       'ioi' => method(:ioi_ranklist_state),
       'ioi_new' => method(:ioi_new_ranklist_state),
+      'homework' => method(:homework_ranklist_state),
     }[rule]
     first_ac = {}
     submissions = submissions.to_a
@@ -104,7 +108,7 @@ module ContestsHelper
       key = "#{sub.user_id}_#{sub.problem_id}"
       is_waiting = ['queued', 'received', 'Validating'].include?(sub.result) || sub.created_at >= freeze_start
       orig_state = res[key][-1]&.dig(:state)
-      new_state = func.call(sub, start_time, orig_state, is_waiting)
+      new_state = func.call(sub, start_time, orig_state, is_waiting, problem_settings)
       res[key] << {timestamp: submission_rel_timestamp(sub, start_time), state: new_state} unless new_state.nil?
       first_ac[sub.problem_id] = first_ac.fetch(sub.problem_id, sub.user_id) if sub.result == 'AC' && sub.created_at < freeze_start
     end

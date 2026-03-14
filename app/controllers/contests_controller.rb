@@ -43,7 +43,11 @@ class ContestsController < ApplicationController
       flash.now[:notice] = "Scoreboard is now frozen."
     end
 
-    @data = helpers.ranklist_data(c_submissions.order(:created_at), @contest.start_time, freeze_start, @contest.contest_type)
+    problem_settings = (@contest.contest_type == 'homework' ?
+                        @contest.contest_problem_joints.order("id ASC").includes(:problem).index_by(&:problem_id) : nil)
+                        
+
+    @data = helpers.ranklist_data(c_submissions.order(:created_at), @contest.start_time, freeze_start, @contest.contest_type, problem_settings)
     @data[:participants] |= @contest.approved_registered_users.ids
     @participants = UserBase.where(id: @data[:participants])
     @data[:tasks] = @tasks.map(&:id)
