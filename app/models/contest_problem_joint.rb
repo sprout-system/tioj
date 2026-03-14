@@ -21,4 +21,9 @@ class ContestProblemJoint < ApplicationRecord
 
   belongs_to :contest
   belongs_to :problem
+
+  def get_multiplier(submit_time)
+    submit_time <= soft_deadline ? regular_multiplier : soft_deadline_multiplier
+  end
+
 end

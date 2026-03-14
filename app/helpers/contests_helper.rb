@@ -87,11 +87,29 @@ module ContestsHelper
   end
 
   def homework_ranklist_state(submission, start_time, item_state, is_waiting, problem_settings) 
+    # state: [score, has_sub, waiting, subtask_scores]
+    if item_state.nil?
+      item_state = [BigDecimal(0), false, 0, nil]
+    end
+    item_state = item_state.dup
+    if is_waiting
+      item_state[2] += 1
+      item_state
+    else
+      scores = submission.get_subtask_result.map{|x| x[:score] * problem_settings[submission.problem_id].get_multiplier(submission.created_at)}
+      if item_state[3].nil?
+        item_state[3] = scores
+      else
+        item_state[3] = item_state[3].zip(scores).map(&:max)
+      end
+      nscore = item_state[3].sum
+      item_state[0] >= nscore && item_state[1] ? nil : [nscore, true, item_state[2], item_state[3]]
+    end
   end
 
   public
 
-  def ranklist_data(submissions, start_time, freeze_start, rule, problem_settings)
+  def ranklist_data(submissions, start_time, freeze_start, rule, problem_settings = nil)
     res = Hash.new { |h, k| h[k] = [] }
     participants = Set[]
     func = {
