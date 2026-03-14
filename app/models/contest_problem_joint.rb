@@ -2,11 +2,14 @@
 #
 # Table name: contest_problem_joints
 #
-#  id         :bigint           not null, primary key
-#  contest_id :bigint
-#  problem_id :bigint
-#  created_at :datetime
-#  updated_at :datetime
+#  id                       :bigint           not null, primary key
+#  contest_id               :bigint
+#  problem_id               :bigint
+#  soft_deadline            :datetime
+#  regular_multiplier       :decimal
+#  soft_deadline_multiplier :decimal
+#  created_at               :datetime
+#  updated_at               :datetime
 #
 # Indexes
 #
