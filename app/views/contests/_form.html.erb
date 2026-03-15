@@ -125,14 +125,44 @@
     <strong>Oh Geez! </strong> <%= "Make sure tasks are set to `visible during contest`." %>
   <% end %>
 
+  <div class="form-group bulk-setter-row">
+    <div class="row">
+      <div class="col-md-2"><strong>Bulk Set All:</strong></div>
+      <div class="col-md-2"></div>
+      <div class="col-md-2">
+        <input type="datetime-local" id="master-soft-deadline" class="form-control flat">
+      </div>
+      <div class="col-md-1">
+        <input type="number" id="master-regular-mult" class="form-control flat">
+      </div>
+      <div class="col-md-1">
+        <input type="number" id="master-soft-mult" class="form-control flat">
+      </div>
+      <div class="col-md-3">
+        <button type="button" id="apply-bulk-set" class="btn btn-primary">Apply to All</button>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
   <%= f.fields_for :contest_problem_joints do |t| %>
-    <div class="form-group">
+    <div class="form-group contest-problem-row">
       <div class="row">
-        <div class="col-md-1">
-          <%= t.label :task %>
+        <div class="col-md-2">
+          <%= t.label :task, 'Task / soft-deadline / regular mult / soft-deadline mult' %>
         </div>
         <div class="col-md-2">
           <%= t.number_field :problem_id, class: 'form-control flat', autocomplete: "off" %>
+        </div>
+        <div class="col-md-2">
+          <%= t.datetime_field :soft_deadline, class: 'form-control flat soft-deadline-field', autocomplete: "off" %>
+        </div>
+        <div class="col-md-1">
+          <%= t.number_field :regular_multiplier, class: 'form-control flat regular-mult-field', autocomplete: "off" %>
+        </div>
+        <div class="col-md-1">
+          <%= t.number_field :soft_deadline_multiplier, class: 'form-control flat soft-mult-field', autocomplete: "off" %>
         </div>
         <div class="col-md-3">
           <%= t.link_to_remove "Remove this task", class: "btn btn-danger" %>
@@ -149,4 +179,33 @@
   </div>
 <% end %>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const applyBtn = document.getElementById('apply-bulk-set');
+
+  if (applyBtn) {
+    applyBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      // 1. Get values from the Master row
+      const masterDeadline = document.getElementById('master-soft-deadline').value;
+      const masterRegMult = document.getElementById('master-regular-mult').value;
+      const masterSoftMult = document.getElementById('master-soft-mult').value;
+
+      // 2. Loop through every row and update if master value is present
+      document.querySelectorAll('.contest-problem-row').forEach(row => {
+        if (masterDeadline) {
+          row.querySelector('.soft-deadline-field').value = masterDeadline;
+        }
+        if (masterRegMult) {
+          row.querySelector('.regular-mult-field').value = masterRegMult;
+        }
+        if (masterSoftMult) {
+          row.querySelector('.soft-mult-field').value = masterSoftMult;
+        }
+      });
+    });
+  }
+});
+</script>
 <script>buttonCheckboxSetup()</script>
