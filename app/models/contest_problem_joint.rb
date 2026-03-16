@@ -19,4 +19,22 @@ class ContestProblemJoint < ApplicationRecord
 
   belongs_to :contest
   belongs_to :problem
+
+  def get_multiplier(submit_time)
+    match = str_to_date_array(soft_deadline).find do |timestamp, _|
+      timestamp > submit_time
+    end
+    match ? match[1] : 0
+  end
+
+  def str_to_date_array(s)
+    s.split(',').map do |pair|
+      timestamp_str, value = pair.split(':')
+      [
+        DateTime.strptime(timestamp_str, '%Y%m%d%H%M%S').new_offset('+08:00'),
+        value.to_f
+      ]
+    end
+  end
+
 end
