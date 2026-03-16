@@ -96,7 +96,8 @@ module ContestsHelper
       item_state[2] += 1
       item_state
     else
-      scores = submission.get_subtask_result.map{|x| x[:score] * problem_settings[submission.problem_id].get_multiplier(submission.created_at)}
+      mul = problem_settings[submission.problem_id].get_multiplier(submission.created_at)
+      scores = submission.get_subtask_result.map{|x| x[:score] * mul}
       if item_state[3].nil?
         item_state[3] = scores
       else
@@ -131,7 +132,7 @@ module ContestsHelper
       first_ac[sub.problem_id] = first_ac.fetch(sub.problem_id, sub.user_id) if sub.result == 'AC' && sub.created_at < freeze_start
     end
     res.delete_if { |key, value| value.empty? }
-    res.each_value {|x| x.each {|item| item[:state].pop}} if rule == 'ioi_new'
+    res.each_value {|x| x.each {|item| item[:state].pop}} if rule == 'ioi_new' || rule == 'homework'
     {result: res, participants: participants.to_a, first_ac: first_ac}
   end
 

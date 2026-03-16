@@ -34,7 +34,7 @@ class ContestsController < ApplicationController
     else
       c_submissions = @contest.submissions
     end
-    c_submissions = c_submissions.includes(:submission_subtask_result) if @contest.type_ioi_new?
+    c_submissions = c_submissions.includes(:submission_subtask_result) if @contest.type_ioi_new? || @contest.type_homework?
 
     freeze_start = (
         (current_user&.admin? && !params[:with_freeze]) || self_only ?
