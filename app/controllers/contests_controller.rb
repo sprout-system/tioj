@@ -263,6 +263,7 @@ class ContestsController < ApplicationController
       contest_problem_joints_attributes: [
         :id,
         :problem_id,
+        :soft_deadline,
         :_destroy
       ]
     )
