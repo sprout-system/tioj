@@ -214,6 +214,11 @@ class ContestsController < ApplicationController
     problem_params = contest_params[:contest_problem_joints_attributes]&.values
     return true if problem_params.nil?
     problems = problem_params.map { |val| Integer(val['problem_id'], exception: false) }
+    problems_soft_deadline = problem_params.map { |val| val['soft_deadline'] }
+    if problems_soft_deadline.any? { |s| !(s.delete(" \t\r\n") =~ /\A(?:\d{14}:\d+(?:\.\d+)?(?:,\d{14}:\d+(?:\.\d+)?)*)?\z/) }
+      @contest.errors.add(:problems, '- Invalid soft deadline format')
+      return false
+    end
     if problems.any?{ |e| e.nil? }
       @contest.errors.add(:problems, '- Invalid problem')
       return false

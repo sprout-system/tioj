@@ -28,11 +28,10 @@ class ContestProblemJoint < ApplicationRecord
   end
 
   def str_to_date_array(s)
-    s.split(',').map do |pair|
-      timestamp_str, value = pair.split(':')
+    s.delete(" \t\r\n").scan(/(\d{14}):(\d+(?:\.\d+)?)/).map do |ts_str, val_str|
       [
-        DateTime.strptime(timestamp_str, '%Y%m%d%H%M%S').new_offset('+08:00'),
-        value.to_f
+        DateTime.strptime(ts_str, '%Y%m%d%H%M%S').new_offset('+08:00'),
+        val_str.to_f
       ]
     end
   end
