@@ -80,6 +80,7 @@ Rails.application.routes.draw do
       post 'register'
       get 'dashboard'
       get 'dashboard_update'
+      get 'dashboard_download', defaults: { format: 'json' }
     end
   end
 

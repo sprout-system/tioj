@@ -1,10 +1,10 @@
 class ContestsController < ApplicationController
   before_action :authenticate_user_and_running_if_single_contest!, only: [:dashboard, :dashboard_update]
   before_action :authenticate_user!, only: [:register]
-  before_action :authenticate_admin!, only: [:set_contest_task, :new, :create, :edit, :update, :destroy]
+  before_action :authenticate_admin!, only: [:set_contest_task, :new, :create, :edit, :update, :destroy, :dashboard_download]
   before_action :check_started!, only: [:dashboard]
-  before_action :set_tasks, only: [:show, :dashboard, :dashboard_update, :set_contest_task]
-  before_action :calculate_ranking, only: [:dashboard, :dashboard_update]
+  before_action :set_tasks, only: [:show, :dashboard, :dashboard_update, :dashboard_download, :set_contest_task]
+  before_action :calculate_ranking, only: [:dashboard, :dashboard_update, :dashboard_download]
   layout :set_contest_layout, only: [:show, :edit, :dashboard, :sign_in]
 
   def set_contest_task
@@ -62,6 +62,14 @@ class ContestsController < ApplicationController
   end
 
   def dashboard
+  end
+
+  def dashboard_download
+    respond_to do |format|
+      format.json do 
+        send_data @data.to_json, filename: "dashboard.json", type: "application/json", disposition: 'attachment'
+      end
+    end
   end
 
   def dashboard_update
