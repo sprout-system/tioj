@@ -22,7 +22,7 @@ class ContestProblemJoint < ApplicationRecord
 
   def get_multiplier(submit_time)
     match = str_to_date_array(soft_deadline).find do |timestamp, _|
-      timestamp > submit_time
+      timestamp >= submit_time
     end
     match ? match[1] : 0
   end
