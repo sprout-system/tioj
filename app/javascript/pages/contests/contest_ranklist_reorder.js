@@ -26,7 +26,6 @@ function acmCellText(current, user_state, first_ac) {
 
       user_state.solved += 1;
       user_state.tot_penalty += penalty + 20 * (current.state[0] - 1);
-      if (current.state[3] !== null) user_state.tot_runtime += current.state[3];
       if (current.state[1] > user_state.last_solved) user_state.last_solved = current.state[1];
     } else {
       if (current.state[0]) {
@@ -43,7 +42,7 @@ function acmCellText(current, user_state, first_ac) {
 function acmRowSummary(user_id, user_state) {
   $('#cell_solved_' + user_id).text(user_state.solved);
   $('#cell_penalty_' + user_id).text(user_state.tot_penalty);
-  return [-user_state.solved, user_state.tot_penalty, user_state.tot_runtime, user_state.last_solved];
+  return [-user_state.solved, user_state.tot_penalty, user_state.last_solved];
 }
 
 function ioiCellText(current, user_state, first_ac) {
@@ -52,7 +51,6 @@ function ioiCellText(current, user_state, first_ac) {
     let value = new Decimal(current.state[0]);
     text = value.toString();
     user_state.score = user_state.score.add(value);
-    if (current.state[3] !== null) user_state.tot_runtime += current.state[3];
     if (current.state[2]) {
       text += ' <small><span style="color:#888;">+' + current.state[2] + '</span></small>';
     }
@@ -62,7 +60,7 @@ function ioiCellText(current, user_state, first_ac) {
 
 function ioiRowSummary(user_id, user_state) {
   $('#cell_score_' + user_id).text(user_state.score.toString());
-  return [-user_state.score, user_state.tot_runtime];
+  return [-user_state.score];
 }
 
 import * as bounds from 'binary-search-bounds';
@@ -127,7 +125,7 @@ export function contestRanklistReorder(data, timestamp) {
     reorderTableInternal(
       data,
       timestamp,
-      {solved: 0, tot_penalty: 0, tot_runtime: Number(0), last_solved: -1},
+      {solved: 0, tot_penalty: 0, last_solved: -1},
       acmCellText,
       acmRowSummary
     );
@@ -135,7 +133,7 @@ export function contestRanklistReorder(data, timestamp) {
     reorderTableInternal(
       data,
       timestamp,
-      {score: new Decimal(0), tot_runtime: Number(0)},
+      {score: new Decimal(0)},
       ioiCellText,
       ioiRowSummary
     );

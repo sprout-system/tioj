@@ -35,7 +35,7 @@ module ContestsHelper
   def acm_ranklist_state(submission, start_time, item_state, is_waiting, problem_settings)
     # state: [attempts, ac_usec, waiting]
     if item_state.nil?
-      item_state = [0, nil, 0, nil]
+      item_state = [0, nil, 0]
     end
     return nil if not item_state[1].nil?
     item_state = item_state.dup
@@ -46,7 +46,6 @@ module ContestsHelper
       if submission.result == 'AC'
         item_state[1] = submission_rel_timestamp(submission, start_time)
         item_state[2] = 0
-        item_state[3] = submission.total_time
       end
     end
     item_state
@@ -55,25 +54,21 @@ module ContestsHelper
   def ioi_ranklist_state(submission, start_time, item_state, is_waiting, problem_settings)
     # state: [score, has_sub, waiting]
     if item_state.nil?
-      item_state = [BigDecimal(0), false, 0, nil]
+      item_state = [BigDecimal(0), false, 0]
     end
     if is_waiting
       item_state = item_state.dup
       item_state[2] += 1
       item_state
     else
-      same_score_better_runtime = item_state[1] && item_state[0] == submission.score && (
-        item_state[3].nil? || (!submission.total_time.nil? && submission.total_time < item_state[3])
-      )
-      better_score = !item_state[1] || submission.score > item_state[0]
-      (better_score || same_score_better_runtime) ? [submission.score, true, item_state[2], submission.total_time] : nil
+      item_state[0] >= submission.score && item_state[1] ? nil : [submission.score, true, item_state[2]]
     end
   end
 
   def ioi_new_ranklist_state(submission, start_time, item_state, is_waiting, problem_settings)
     # state: [score, has_sub, waiting, subtask_scores]
     if item_state.nil?
-      item_state = [BigDecimal(0), false, 0, nil, nil]
+      item_state = [BigDecimal(0), false, 0, nil]
     end
     item_state = item_state.dup
     if is_waiting
@@ -81,17 +76,13 @@ module ContestsHelper
       item_state
     else
       scores = submission.get_subtask_result.map{|x| x[:score]}
-      if item_state[4].nil?
-        item_state[4] = scores
+      if item_state[3].nil?
+        item_state[3] = scores
       else
-        item_state[4] = item_state[4].zip(scores).map(&:max)
+        item_state[3] = item_state[3].zip(scores).map(&:max)
       end
-      nscore = item_state[4].sum
-      same_score_better_runtime = item_state[1] && item_state[0] == nscore && (
-        item_state[3].nil? || (!submission.total_time.nil? && submission.total_time < item_state[3])
-      )
-      better_score = !item_state[1] || nscore > item_state[0]
-      (better_score || same_score_better_runtime) ? [nscore, true, item_state[2], submission.total_time, item_state[4]] : nil
+      nscore = item_state[3].sum
+      item_state[0] >= nscore && item_state[1] ? nil : [nscore, true, item_state[2], item_state[3]]
     end
   end
 
