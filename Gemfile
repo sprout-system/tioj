@@ -89,6 +89,11 @@ gem 'redis', '~> 4'
 gem 'sentry-ruby'
 gem 'sentry-rails'
 
+# 2026-03-13: gems seemed to had removed from Ruby 3.4 as builtin
+gem 'erb'
+gem 'mutex_m'
+gem 'csv'
+
 group :development do
   # Bullet for debugging
   gem 'bullet', group: 'development'
