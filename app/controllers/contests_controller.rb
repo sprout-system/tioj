@@ -1,10 +1,10 @@
 class ContestsController < ApplicationController
   before_action :authenticate_user_and_running_if_single_contest!, only: [:dashboard, :dashboard_update]
   before_action :authenticate_user!, only: [:register]
-  before_action :authenticate_admin!, only: [:set_contest_task, :new, :create, :edit, :update, :destroy]
+  before_action :authenticate_admin!, only: [:set_contest_task, :new, :create, :edit, :update, :destroy, :dashboard_download]
   before_action :check_started!, only: [:dashboard]
-  before_action :set_tasks, only: [:show, :dashboard, :dashboard_update, :set_contest_task]
-  before_action :calculate_ranking, only: [:dashboard, :dashboard_update]
+  before_action :set_tasks, only: [:show, :dashboard, :dashboard_update, :dashboard_download, :set_contest_task]
+  before_action :calculate_ranking, only: [:dashboard, :dashboard_update, :dashboard_download]
   layout :set_contest_layout, only: [:show, :edit, :dashboard, :sign_in]
 
   def set_contest_task
@@ -34,7 +34,7 @@ class ContestsController < ApplicationController
     else
       c_submissions = @contest.submissions
     end
-    c_submissions = c_submissions.includes(:submission_subtask_result) if @contest.type_ioi_new?
+    c_submissions = c_submissions.includes(:submission_subtask_result) if @contest.type_ioi_new? || @contest.type_homework?
 
     freeze_start = (
         (current_user&.admin? && !params[:with_freeze]) || self_only ?
@@ -43,7 +43,11 @@ class ContestsController < ApplicationController
       flash.now[:notice] = "Scoreboard is now frozen."
     end
 
-    @data = helpers.ranklist_data(c_submissions.order(:created_at), @contest.start_time, freeze_start, @contest.contest_type)
+    problem_settings = (@contest.contest_type == 'homework' ?
+                        @contest.contest_problem_joints.order("id ASC").includes(:problem).index_by(&:problem_id) : nil)
+                        
+
+    @data = helpers.ranklist_data(c_submissions.order(:created_at), @contest.start_time, freeze_start, @contest.contest_type, problem_settings)
     @data[:participants] |= @contest.approved_registered_users.ids
     @participants = UserBase.where(id: @data[:participants])
     @data[:tasks] = @tasks.map(&:id)
@@ -58,6 +62,14 @@ class ContestsController < ApplicationController
   end
 
   def dashboard
+  end
+
+  def dashboard_download
+    respond_to do |format|
+      format.json do 
+        send_data @data.to_json, filename: "dashboard.json", type: "application/json", disposition: 'attachment'
+      end
+    end
   end
 
   def dashboard_update
@@ -210,6 +222,11 @@ class ContestsController < ApplicationController
     problem_params = contest_params[:contest_problem_joints_attributes]&.values
     return true if problem_params.nil?
     problems = problem_params.map { |val| Integer(val['problem_id'], exception: false) }
+    problems_soft_deadline = problem_params.map { |val| val['soft_deadline'] }
+    if problems_soft_deadline.any? { |s| !(s.delete(" \t\r\n") =~ /\A(?:\d{14}:\d+(?:\.\d+)?(?:,\d{14}:\d+(?:\.\d+)?)*)?\z/) }
+      @contest.errors.add(:problems, '- Invalid soft deadline format')
+      return false
+    end
     if problems.any?{ |e| e.nil? }
       @contest.errors.add(:problems, '- Invalid problem')
       return false
@@ -259,6 +276,7 @@ class ContestsController < ApplicationController
       contest_problem_joints_attributes: [
         :id,
         :problem_id,
+        :soft_deadline,
         :_destroy
       ]
     )

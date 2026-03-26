@@ -3,6 +3,45 @@ require 'test_helper'
 class ContestsHelperTest < ActionView::TestCase
   include ApplicationHelper
 
+  test "ranklist_data homework score is correct" do
+    problem = Problem.new(
+      id: 1,
+      testdata: Array.new(2){ Testdatum.new() },
+      subtasks: [
+        Subtask.new(td_list: '0', score: 50),
+        Subtask.new(td_list: '1', score: 50),
+      ],
+    )
+    cpj = {1 => ContestProblemJoint.new(
+      soft_deadline: "20260101000003:5,20260101010000:2"
+    )}
+    submissions = [
+      Submission.new(user_id: 1, problem: problem, result: "WA", score: 50, submission_testdata_results: [
+        SubmissionTestdataResult.new(score: 20, position: 0), # weighted score: 10 * 5
+        SubmissionTestdataResult.new(score: 80, position: 1), # weighted score: 40 * 5
+      ]),
+      Submission.new(user_id: 1, problem: problem, result: "WA", score: 90, submission_testdata_results: [
+        SubmissionTestdataResult.new(score: 80, position: 0), #  weighted score: 40 * 2
+        SubmissionTestdataResult.new(score: 100, position: 1), # weighted score: 50 * 2
+      ]),
+    ]
+    start_time = Time.new(2026, 1, 1, 0, 0, 0)
+    freeze_start = Time.new(2026, 1, 1, 1, 0, 0)
+    submissions.each_with_index {|x, i| x.created_at = start_time + i * 10 + 1}
+    submissions.each {|x| x.generate_subtask_result(true)}
+    expected_result = {
+      result: {
+        "1_1" => [
+          {timestamp: 1000000, state: [250, true, 0]},
+          {timestamp: 11000000, state: [280, true, 0]},
+        ],
+      },
+      participants: [1],
+      first_ac: {},
+    }
+    assert_equal expected_result, ranklist_data(submissions, start_time, freeze_start, 'homework', cpj)
+  end
+
   test "ranklist_data ioi-style score & freeze is correct" do
     submissions = [
       Submission.new(user_id: 1, problem_id: 1, result: "WA", score: 50),
