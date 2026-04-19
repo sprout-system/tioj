@@ -113,6 +113,16 @@
       <% end %>
     <% end %>
   </div>
+
+  <div style="margin-bottom:10px;">
+    <%= form_with url: batch_update_tags_contest_path(@contest), class: 'form-inline' do |f| %>
+      <div class="form-group">
+        <%= f.text_field :tag_name, class: 'form-control input-xs', placeholder: 'Tag name' %>
+      </div>
+      <%= f.button "Add Tag to All Tasks", name: 'operation', value: 'add', class: 'btn btn-info btn-xs' %>
+      <%= f.button "Remove Tag from All Tasks", name: 'operation', value: 'remove', class: 'btn btn-danger btn-xs' %>
+    <% end %>
+  </div>
 <% end %>
 
 <% unless @layout == :single_contest && (!user_signed_in? || !@contest.is_running?) %>
@@ -124,6 +134,11 @@
       <% if @contest.is_started? || current_user&.admin? %>
         <% @tasks.each_with_index do |task, index| %>
           <%= link_to (problem_index_text(index) + ' ' + task.id.to_s + '. ' + task.name), contest_adaptive_polymorphic_path([task]) %>
+          <% if effective_admin? %>
+            <span style="margin-left: 10px;">
+              <%= tag_list_html(task) %>
+            </span>
+          <% end %>
           <br>
         <% end %>
       <% else %>
