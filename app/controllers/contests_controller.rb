@@ -67,7 +67,7 @@ class ContestsController < ApplicationController
   def dashboard_download
     respond_to do |format|
       format.json do 
-        send_data @data.to_json, filename: "dashboard.json", type: "application/json", disposition: 'attachment'
+        send_data helpers.dashboard_data_prettify(@data).to_json, filename: "dashboard.json", type: "application/json", disposition: 'attachment'
       end
     end
   end

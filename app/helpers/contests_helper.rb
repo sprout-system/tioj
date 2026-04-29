@@ -145,6 +145,23 @@ module ContestsHelper
     {result: res, participants: participants.to_a, first_ac: first_ac}
   end
 
+  # used by dashboard_download
+  # "data" in the parameter should be the one
+  # returned by calculate_ranking instead of ranklist_data
+  def dashboard_data_prettify(data)
+    res = data[:participants].map {|user_id| {
+      user_id: user_id,
+      score: data[:tasks].map { |task_id| {
+        task_id: task_id,
+        score: (
+          data[:result]["#{user_id}_#{task_id}"].empty? ? 0.0 :
+          data[:result]["#{user_id}_#{task_id}"].last[:state][0]
+        ),
+      }},
+    }}
+    {tasks: data[:tasks], participants: data[:participants], result: res}
+  end
+
   def problem_index_text(index)
     text = ''
     while index >= 26
