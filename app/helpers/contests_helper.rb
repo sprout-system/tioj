@@ -142,6 +142,7 @@ module ContestsHelper
   def dashboard_data_prettify(data)
     res = data[:participants].map {|user_id| {
       user_id: user_id,
+      name: User.find(user_id).username,
       score: data[:tasks].map { |task_id| {
         task_id: task_id,
         score: (
