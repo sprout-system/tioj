@@ -1,9 +1,9 @@
 class ContestsController < ApplicationController
   before_action :authenticate_user_and_running_if_single_contest!, only: [:dashboard, :dashboard_update]
   before_action :authenticate_user!, only: [:register]
-  before_action :authenticate_admin!, only: [:set_contest_task, :new, :create, :edit, :update, :destroy, :dashboard_download]
+  before_action :authenticate_admin!, only: [:set_contest_task, :batch_update_tags, :new, :create, :edit, :update, :destroy, :dashboard_download]
   before_action :check_started!, only: [:dashboard]
-  before_action :set_tasks, only: [:show, :dashboard, :dashboard_update, :dashboard_download, :set_contest_task]
+  before_action :set_tasks, only: [:show, :dashboard, :dashboard_update, :dashboard_download, :set_contest_task, :batch_update_tags]
   before_action :calculate_ranking, only: [:dashboard, :dashboard_update, :dashboard_download]
   layout :set_contest_layout, only: [:show, :edit, :dashboard, :sign_in]
 
@@ -13,6 +13,25 @@ class ContestsController < ApplicationController
     name = Problem.visible_states.key(alter_to)
     flash[:notice] = "Contest tasks set to #{helpers.visible_state_desc_map[name]}."
     @tasks.map{|a| a.update(visible_state: alter_to)}
+  end
+
+  def batch_update_tags
+    tag_name = params[:tag_name].to_s.strip
+    if tag_name.blank?
+      flash[:alert] = "Tag name cannot be blank."
+    else
+      operation = params[:operation]
+      @tasks.each do |problem|
+        if operation == 'add'
+          problem.tag_list.add(tag_name)
+        elsif operation == 'remove'
+          problem.tag_list.remove(tag_name)
+        end
+        problem.save
+      end
+      flash[:notice] = "Successfully #{operation == 'add' ? 'added' : 'removed'} tag '#{tag_name}' to all tasks in the contest."
+    end
+    redirect_to contest_path(@contest)
   end
 
   def calculate_ranking
