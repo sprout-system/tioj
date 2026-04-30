@@ -155,7 +155,7 @@ module ContestsHelper
       score: data[:tasks].map { |task_id| {
         task_id: task_id,
         score: (
-          data[:result]["#{user_id}_#{task_id}"].empty? ? 0.0 :
+          data[:result]["#{user_id}_#{task_id}"].empty? ? "0.0" :
           data[:result]["#{user_id}_#{task_id}"].last[:state][0]
         ),
       }},
