@@ -3,6 +3,40 @@
   Dashboard <small><%= @contest.title %></small>
   <% if current_user&.admin? %>
     <%= link_to 'Download', contest_adaptive_polymorphic_path([], action: :dashboard_download), {class: 'btn btn-xs btn-info'} %>
+
+    <%= help_collapse_toggle('', 'downloadDescription') %>
+    <div class="collapse" id="downloadDescription" style="height: auto;">
+      <div class="panel panel-default">
+        <div class="panel-body small" style="line-height: 1.4;">
+          Here you can download <span class="code-input small">dashboard.json</span>, it contains the information of the current dashboard.<br/>
+          An example of the format:
+          <pre class="code-input small">
+{
+  "tasks": [1, 2],
+  "participants": [101, 102],
+  "result": [
+    {
+      "user-id": 101,
+      "name": "username1",
+      "score": [
+        { "task_id": 1, "score": 500.0 },
+        { "task_id": 2, "score": 100.0 }
+      ]
+    },
+    {
+      "user-id": 102,
+      "name": "username2",
+      "score": [
+        { "task_id": 1, "score": 25.0 },
+        { "task_id": 2, "score": 0.0 }
+      ]
+    }
+  ]
+}
+          </pre>
+        </div>
+      </div>
+    </div>
   <% end %>
 </h4>
 
