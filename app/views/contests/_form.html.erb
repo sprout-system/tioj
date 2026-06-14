@@ -150,6 +150,9 @@
         <div class="col-md-4">
           <%= t.text_field :soft_deadline, class: 'form-control flat', autocomplete: "off" %>
         </div>
+        <div class="col-md-1">
+          <%= t.color_field :color, class: 'form-control flat', value: t.object.color || '#34495E' %>
+        </div>
         <div class="col-md-3">
           <%= t.link_to_remove "Remove this task", class: "btn btn-danger" %>
         </div>
