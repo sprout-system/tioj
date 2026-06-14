@@ -6,6 +6,7 @@
 #  contest_id     :bigint
 #  problem_id     :bigint
 #  soft_deadline  :string
+#  color          :string
 #  created_at     :datetime
 #  updated_at     :datetime
 #
