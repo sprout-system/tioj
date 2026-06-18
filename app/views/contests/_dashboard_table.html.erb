@@ -29,7 +29,7 @@
       <% end %>
       <td class="highlight-if-self"><%= usr.nickname %></td>
       <% @tasks.each do |t|%>
-        <td id="cell_item_<%= usr.id %>_<%= t.id %>"></td>
+        <td id="cell_item_<%= usr.id %>_<%= t.id %>" <%= @contest.contest_type == 'homework' ? "style='color: #{@task_colors[t.id]}'".html_safe : "" %>></td>
       <% end %>
       <% if @contest.type_acm? %>
         <td id="cell_solved_<%= usr.id %>"></td>

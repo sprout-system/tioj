@@ -81,6 +81,9 @@ class ContestsController < ApplicationController
   end
 
   def dashboard
+    if @contest.contest_type == 'homework'
+      @task_colors = @contest.contest_problem_joints.order("id ASC").includes(:problem).map{|e| [e.problem.id, e.color]}.to_h
+    end
   end
 
   def dashboard_download
@@ -246,6 +249,11 @@ class ContestsController < ApplicationController
       @contest.errors.add(:problems, '- Invalid soft deadline format')
       return false
     end
+    problems_colors = problem_params.map { |val| val['color'] }
+    if problems_colors.any? { |c| c.present? && !(c =~ /\A#[0-9a-fA-F]{6}\z/) }
+      @contest.errors.add(:problems, '- Invalid color format')
+      return false
+    end
     if problems.any?{ |e| e.nil? }
       @contest.errors.add(:problems, '- Invalid problem')
       return false
@@ -296,6 +304,7 @@ class ContestsController < ApplicationController
         :id,
         :problem_id,
         :soft_deadline,
+        :color,
         :_destroy
       ]
     )
