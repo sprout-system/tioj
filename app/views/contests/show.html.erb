@@ -115,6 +115,24 @@
   </div>
 
   <div style="margin-bottom:10px;">
+    <%= help_collapse_toggle('Batch update task tags', 'batchUpdateTagsDescription') %>
+    <div class="collapse" id="batchUpdateTagsDescription" style="height: auto;">
+      <div class="panel panel-default">
+        <div class="panel-body small" style="line-height: 1.4;">
+          <ol style="margin-bottom: 10px; padding-left: 20px;">
+            <li>Enter the tag name in the input below.</li>
+            <li>Use "Add Tag to All Tasks" to add it to every task in this contest.</li>
+            <li>Use "Remove Tag from All Tasks" to remove it from every task in this contest.</li>
+          </ol>
+          Notes:<br>
+          - This affects all tasks in this contest. To update only some tasks, edit those problems individually.<br>
+          - Leading and trailing spaces are ignored. For example, " graph " is saved as "graph".<br>
+          - Adding a tag that does not exist creates it automatically.<br>
+          - Removing a tag skips tasks that do not have that tag.<br>
+          - Process one tag name at a time.
+        </div>
+      </div>
+    </div>
     <%= form_with url: batch_update_tags_contest_path(@contest), class: 'form-inline' do |f| %>
       <div class="form-group">
         <%= f.text_field :tag_name, class: 'form-control input-xs', placeholder: 'Tag name' %>
