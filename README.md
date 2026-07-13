@@ -22,10 +22,12 @@ This script is tested on Ubuntu 20.04 LTS and 22.04 LTS. It also works on Arch L
 It is strongly recommended to mount tmpfs on `/tmp` by adding `tmpfs /tmp tmpfs rw,nosuid,nodev` in `/etc/fstab`.
 
 ### Docker
-
-1. Install `docker-compose` and setup `.env` using the format of `.env.example`.
+1. Install Docker Compose and setup `.env` using the format of `.env.example`.
     - The `SMTP_*` and `MAIL_*` variables are only added if password recovery function is needed. Without them, the function is automatically disabled.
-2. `docker-compose up -d` and enjoy TIOJ on port 4000.
+2. Run one of the following modes:
+    - Production mode: `docker compose -f docker-compose.yml up -d`
+    - Development mode: `docker compose -f docker-compose.dev.yml up --build` (Note: dev mode shares the same DB as prod mode.)
+3. Enjoy TIOJ on port 4000.
 
 ### Settings
 
